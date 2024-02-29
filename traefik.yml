@@ -1,0 +1,30 @@
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+    http:
+      tls:
+        certResolver: le
+
+certificatesResolvers:
+  le:
+    acme:
+      email: arturboyun@gmail.com
+      storage: acme.json
+      tlsChallenge: true
+#      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: http
+
+api:
+  insecure: true
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik_default
+
+log:
+  level: DEBUG

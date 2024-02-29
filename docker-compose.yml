@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  # traefik:
+  #   image: traefik:v2.2
+  #   container_name: traefik
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "8080:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ./traefik.yml:/traefik.yml:ro
+  #     - ./acme.json:/acme.json
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    image: api
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: on-failure
+    volumes:
+      - redis-data:/root/redis
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_beat
+    command: [ 'celery', '-A', 'tasks.main', 'beat', '-l', 'info' ]
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      # - flower
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_worker
+    command: [ 'celery', '-A', 'tasks.main', 'worker', '-l', 'info' ]
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - celery_beat
+      # - flower
+
+  # flower:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: [ 'celery', '-A', 'tasks.main', 'flower', '-l', 'info' ]
+  #   ports:
+  #     - "5555:5555"
+  #   depends_on:
+  #     - redis
+
+networks:
+  default:
+    name: default-network
+
+volumes:
+  redis-data:
+  flower-data:
