@@ -1,8 +1,11 @@
+from typing import AsyncIterator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.db import db_manager
-from app.logs.repositories.log_repo import LogRepo
-from utils.uow.uow_base import IUoW
+from app.modules.logs.repositories.log_repo import LogRepo
+from app.modules.auth.repositories.auth_repo import AuthRepo
+from app.modules.users.repositories.user_repo import UserRepo
+from .uow_base import IUoW
 
 
 class SAUoW(IUoW):
@@ -19,13 +22,14 @@ class SAUoW(IUoW):
         await self.session.close()
 
     async def __aenter__(self):
-        self.log_repo = LogRepo(self.session)
+        self.auth_repo = AuthRepo(self.session)
+        self.user_repo = UserRepo(self.session)
         return self
 
     async def __aexit__(self, *args):
         await self.close()
 
 
-async def get_uow() -> SAUoW:
+async def get_uow() -> AsyncIterator[SAUoW]:
     async with db_manager.session_factory() as session:
         yield SAUoW(session)

@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.logs.services import LogService
-from app.schemes import LogCreate, LogDB
+from .services import LogService
+from .schemes import LogCreate, LogDB
 from utils.uow.sqlalchemy_uow import SAUoW, get_uow
 
 router = APIRouter(prefix="/log")

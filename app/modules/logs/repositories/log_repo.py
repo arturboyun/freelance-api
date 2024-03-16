@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.logs.models import Log
+from app.modules.logs.models import Log
 from utils.sqlalchemy.order import get_order_direction
 
 

@@ -1,6 +1,6 @@
 import datetime
 
-from app.schemes import LogCreate, LogDB
+from .schemes import LogCreate, LogDB
 from utils.uow.uow_base import IUoW
 
 

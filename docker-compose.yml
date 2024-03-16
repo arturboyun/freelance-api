@@ -23,10 +23,36 @@ services:
     restart: on-failure
     ports:
       - "8000:8000"
-    volumes:
-      - ./db.sqlite3:/app/db.sqlite3
     depends_on:
       - redis
+
+  postgres:
+    image: postgres:16
+    container_name: fp-postgres
+    restart: on-failure
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: freelance-platform
+      POSTGRES_USER: nehz
+      POSTGRES_PASSWORD: 123qweasdzxc
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  edgedb:
+    image: edgedb/edgedb
+    restart: on-failure
+    container_name: edgedb
+    environment:
+      EDGEDB_SERVER_SECURITY: insecure_dev_mode
+      # EDGEDB_SERVER_USER: nehz
+      # EDGEDB_SERVER_PASSWORD: 123qweasdzxc
+      EDGEDB_SERVER_PORT: 5656
+    volumes:
+      - "./dbschema:/dbschema"
+      - "./edgedb.toml:/edgedb.toml"
+    ports:
+      - "5656:5656"
 
   redis:
     image: redis:alpine
@@ -76,3 +102,4 @@ networks:
 volumes:
   redis-data:
   flower-data:
+  postgres-data:
